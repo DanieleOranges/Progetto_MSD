@@ -18,7 +18,7 @@ I = [2.2;0.4];
 %% Connections and Materials assignment
 Connections = ["AD","BD","EG","FH","ID","IC"];
 Materials   = ["Blue","Blue","Red","Red","Green","Green"];
-n = 10*ones(length(Connections),1);
+n = [10,10,10,20,10,10]';
 
 %% Element properties calculations
 global EJ EA Area rho E_steel m
@@ -37,18 +37,22 @@ Area        = pi.*((d/2).^2-((d-2*t)/2).^2);
 EA          = E_steel*Area;
 m           = rho*Area;
 
-%% 
+%% Create Structure
+
+% Initialize variables
+x = zeros(max(n(:)),length(Connections)); y = x;
+x(:) = NaN; y(:) = NaN;
 
 for k = 1 : length(Connections)
     
     P1 = eval(Connections{k}(1));
     P2 = eval(Connections{k}(2));
-    [Lmax(k),nmin(k)] = element_size(P1,P2,Materials{k});
-    [x(:,k),y(:,k)]       = mesh(P1,P2,n(k));
+    [Lmax(k),nmin(k)]     = element_size(P1,P2,Materials{k});
+    [x(1:n(k),k),y(1:n(k),k)]       = mesh(P1,P2,n(k));
     
 end
 
-Ntot = length(x(:));
+Ntot = sum(sum(~isnan(x)));
 Node = 1:Ntot;
 Elements = 1:(Ntot-length(Connections));
 
@@ -56,7 +60,7 @@ Elements = 1:(Ntot-length(Connections));
 delete('Fem_Assignment_input_prova')
 fid = fopen('Fem_Assignment_input_prova','w');
 fprintf(fid,'*NODES\n');
-fprintf(fid,'%u    %f    %f\n',[Node;x(:)';y(:)']);
+fprintf(fid,'%u    %f    %f\n',[Node;x(~isnan(x))';y(~isnan(y))']);
 fprintf(fid,'*ENDNODES\n');
 
 %% Elements Creation
