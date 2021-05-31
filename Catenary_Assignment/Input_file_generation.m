@@ -18,7 +18,7 @@ I = [2.2;0.4];
 %% Connections and Materials assignment
 Connections = ["AD","BD","EG","FH","ID","IC"];
 Materials   = ["Blue","Blue","Red","Red","Green","Green"];
-n = 10;
+n = 10*ones(length(Connections),1);
 
 %% Element properties calculations
 global EJ EA Area rho E_steel m
@@ -44,7 +44,7 @@ for k = 1 : length(Connections)
     P1 = eval(Connections{k}(1));
     P2 = eval(Connections{k}(2));
     [Lmax(k),nmin(k)] = element_size(P1,P2,Materials{k});
-    [x(:,k),y(:,k)]       = mesh(P1,P2,n);
+    [x(:,k),y(:,k)]       = mesh(P1,P2,n(k));
     
 end
 
